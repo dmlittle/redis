@@ -62,10 +62,10 @@ func (r *Reader) ReadLine() ([]byte, error) {
 	return line, nil
 }
 
-func (r *Reader) ReadReply(m MultiBulkParse) (interface{}, string, error) {
+func (r *Reader) ReadReply(m MultiBulkParse) (interface{}, rune, error) {
 	line, err := r.ReadLine()
 	if err != nil {
-		return nil, err
+		return nil, 'x', err
 	}
 
 	switch line[0] {

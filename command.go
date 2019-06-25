@@ -144,7 +144,7 @@ type Cmd struct {
 	baseCmd
 
 	val interface{}
-	t   string
+	t   rune
 }
 
 func NewCmd(args ...interface{}) *Cmd {
@@ -157,7 +157,7 @@ func (cmd *Cmd) Val() interface{} {
 	return cmd.val
 }
 
-func (cmd *Cmd) Type() string {
+func (cmd *Cmd) Type() rune {
 	return cmd.t
 }
 
