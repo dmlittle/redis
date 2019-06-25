@@ -91,7 +91,7 @@ func (r *Reader) ReadReply(m MultiBulkParse) (interface{}, rune, error) {
 		v, err := m(r, n)
 		return v, ArrayReply, err
 	}
-	return nil, "", fmt.Errorf("redis: can't parse %.100q", line)
+	return nil, 'x', fmt.Errorf("redis: can't parse %.100q", line)
 }
 
 func (r *Reader) ReadIntReply() (int64, error) {
