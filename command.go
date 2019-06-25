@@ -281,7 +281,7 @@ func (cmd *Cmd) readReply(rd *proto.Reader) error {
 func sliceParser(rd *proto.Reader, n int64) (interface{}, error) {
 	vals := make([]interface{}, 0, n)
 	for i := int64(0); i < n; i++ {
-		v, err := rd.ReadReply(sliceParser)
+		v, t, err := rd.ReadReply(sliceParser)
 		if err != nil {
 			if err == Nil {
 				vals = append(vals, nil)
