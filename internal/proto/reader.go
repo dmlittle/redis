@@ -6,7 +6,7 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/go-redis/redis/internal/util"
+	"github.com/dmlittle/redis/internal/util"
 )
 
 const (
@@ -62,7 +62,7 @@ func (r *Reader) ReadLine() ([]byte, error) {
 	return line, nil
 }
 
-func (r *Reader) ReadReply(m MultiBulkParse) (interface{}, error) {
+func (r *Reader) ReadReply(m MultiBulkParse) (interface{}, string, error) {
 	line, err := r.ReadLine()
 	if err != nil {
 		return nil, err
@@ -70,25 +70,28 @@ func (r *Reader) ReadReply(m MultiBulkParse) (interface{}, error) {
 
 	switch line[0] {
 	case ErrorReply:
-		return nil, ParseErrorReply(line)
+		return nil, ErrorReply, ParseErrorReply(line)
 	case StatusReply:
-		return string(line[1:]), nil
+		return string(line[1:]), StatusReply, nil
 	case IntReply:
-		return util.ParseInt(line[1:], 10, 64)
+		v, err := util.ParseInt(line[1:], 10, 64)
+		return v, IntReply, err
 	case StringReply:
-		return r.readStringReply(line)
+		v, err := r.readStringReply(line)
+		return v, StringReply, err
 	case ArrayReply:
 		n, err := parseArrayLen(line)
 		if err != nil {
-			return nil, err
+			return nil, ArrayReply, err
 		}
 		if m == nil {
 			err := fmt.Errorf("redis: got %.100q, but multi bulk parser is nil", line)
-			return nil, err
+			return nil, ArrayReply, err
 		}
-		return m(r, n)
+		v, err := m(r, n)
+		return v, ArrayReply, err
 	}
-	return nil, fmt.Errorf("redis: can't parse %.100q", line)
+	return nil, "", fmt.Errorf("redis: can't parse %.100q", line)
 }
 
 func (r *Reader) ReadIntReply() (int64, error) {

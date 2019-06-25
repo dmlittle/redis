@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis/internal"
-	"github.com/go-redis/redis/internal/proto"
+	"github.com/dmlittle/redis/internal"
+	"github.com/dmlittle/redis/internal/proto"
 )
 
 type Cmder interface {
@@ -144,6 +144,7 @@ type Cmd struct {
 	baseCmd
 
 	val interface{}
+	t   string
 }
 
 func NewCmd(args ...interface{}) *Cmd {
@@ -154,6 +155,10 @@ func NewCmd(args ...interface{}) *Cmd {
 
 func (cmd *Cmd) Val() interface{} {
 	return cmd.val
+}
+
+func (cmd *Cmd) Type() string {
+	return cmd.t
 }
 
 func (cmd *Cmd) Result() (interface{}, error) {
@@ -268,7 +273,7 @@ func (cmd *Cmd) Bool() (bool, error) {
 }
 
 func (cmd *Cmd) readReply(rd *proto.Reader) error {
-	cmd.val, cmd.err = rd.ReadReply(sliceParser)
+	cmd.val, cmd.t, cmd.err = rd.ReadReply(sliceParser)
 	return cmd.err
 }
 
